@@ -1,6 +1,7 @@
 package com.mainWindow;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class SqliteDB {
 
@@ -19,9 +20,11 @@ public class SqliteDB {
         }
     }
 
-    public void listRooms() {
+    //returns all rooms into ArrayList or null if no room is added
+    public ArrayList<String> listRooms() {
         int id;
         String roomName;
+        ArrayList<String> list= new ArrayList<String>();
 
         try {
             this.statement = connection.createStatement();
@@ -29,7 +32,7 @@ public class SqliteDB {
             while(resultSet.next()){
               id = resultSet.getInt("id");
               roomName = resultSet.getString("roomName");
-
+              list.add(roomName);
               System.out.println("Room id - "+id+" | Room name - "+roomName);
             };
         }catch (Exception e){
@@ -37,8 +40,14 @@ public class SqliteDB {
             System.out.println(e.toString());
         }
 
+        if(!list.isEmpty()){
+            return list;
+        }else{ return null;
+        }
     }
 
+
+    //closes connection
     public void closeConnection(){
         try{
             connection.close();
