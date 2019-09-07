@@ -22,7 +22,7 @@ public class SqliteDB {
 
     //returns all rooms into ArrayList or null if no room is added
     public ArrayList<String> listRooms() {
-        int id;
+        Integer id;
         String roomName;
         ArrayList<String> list= new ArrayList<String>();
 
@@ -33,6 +33,7 @@ public class SqliteDB {
               id = resultSet.getInt("id");
               roomName = resultSet.getString("roomName");
               list.add(roomName);
+              list.add(id.toString());
               System.out.println("Room id - "+id+" | Room name - "+roomName);
             };
         }catch (Exception e){
@@ -46,6 +47,17 @@ public class SqliteDB {
         }
     }
 
+    //deletes a room from
+    public void deleteRoom(Integer id){
+        try {
+            this.statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("DELETE FROM rooms WHERE id="+id);
+            System.out.println("Deleted room with id number ="+id.toString());
+        }catch (Exception e){
+            System.out.println("Failed delete statement on room id="+id);
+            System.out.println(e.toString());
+        }
+    }
 
     //closes connection
     public void closeConnection(){

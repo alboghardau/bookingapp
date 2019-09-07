@@ -16,9 +16,6 @@ public class MainWindow {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new RoomsManager();
-                SqliteDB db = new SqliteDB();
-                db.listRooms();
-                db.closeConnection();
             }
         });
     }

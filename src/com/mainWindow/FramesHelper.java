@@ -32,7 +32,7 @@ public class FramesHelper {
 
 
         JButton addRoom = new JButton();
-        addRoom.setText("AddButton");
+        addRoom.setText("Add Room");
         panel.add(addRoom);
 
         frame.setVisible(true);
