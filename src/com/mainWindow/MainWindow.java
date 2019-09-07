@@ -9,12 +9,13 @@ import java.awt.event.ActionListener;
 public class MainWindow {
     private JPanel panelMain;
     private JButton addRoom;
+    private JButton addBookingButton;
 
     public MainWindow(){
         addRoom.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Muie PSD!");
+                new RoomsManager();
                 SqliteDB db = new SqliteDB();
                 db.listRooms();
                 db.closeConnection();
