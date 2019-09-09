@@ -47,6 +47,17 @@ public class SqliteDB {
         }
     }
 
+    //adds room to rooms
+    public void addRoom(String roomName){
+        try{
+            this.statement = connection.createStatement();
+            statement.executeUpdate(String.format("INSERT INTO rooms (roomName) VALUES('%s')",roomName));
+        }catch (Exception e){
+            System.out.println("Can't add new room!");
+            System.out.println(e.toString());
+        }
+    }
+
     //deletes a room from
     public void deleteRoom(Integer id){
         try {

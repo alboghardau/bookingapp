@@ -11,46 +11,63 @@ import java.util.ArrayList;
 public class RoomsManager {
 
     public static JFrame frame;
+    public static JPanel addRoomPanel;
     public static JPanel buttonsPanel;
     public static JPanel roomsPanel;
+    public static JButton addRoom;
 
+    //contructor that checks for only one variable
     public RoomsManager(){
-        if(frame == null){
+//        if(frame == null){
             frame = new JFrame();
-        }
-        if(buttonsPanel == null){
+//        }
+//        if(buttonsPanel == null){
             buttonsPanel = new JPanel(new GridBagLayout());
-        }
-        if(roomsPanel == null){
+//        }
+//        if(roomsPanel == null){
             roomsPanel = new JPanel(new GridBagLayout());
-        }
-
+//        }
+//        if(addRoomPanel == null){
+            addRoomPanel = new JPanel(new GridBagLayout());
+//        }
         addRoomFrame();
     }
     //displays window to add new room
     public static void addRoomFrame(){
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.setTitle("Rooms Manager");
-        frame.setSize(500,200);
+        frame.setMinimumSize(new Dimension(700,500));
+        frame.setSize(700,500);
 
         GridBagConstraints grid = new GridBagConstraints();
+        grid.insets = new Insets(10,10,10,10);
         //main panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
         frame.add(mainPanel);
 
+        //add room panel
+        grid.gridy = 0;
+        mainPanel.add(addRoomPanel,grid);
+
         //buttons panel
-        grid.insets = new Insets(10,10,10,10);
-        grid.gridx = 0;
-        JPanel buttonsPanel = new JPanel();
+        grid.gridy = 1;
+        mainPanel.add(buttonsPanel,grid);
+        addRoom = new JButton();
+        addRoom.setText("New Room");
+        addRoom.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayAddRoom();
+                addRoom.setEnabled(false);
+            }
+        });
+        buttonsPanel.add(addRoom);
         mainPanel.add(buttonsPanel,grid);
 
-        JButton addRoom = new JButton();
-        addRoom.setText("New Room");
-        mainPanel.add(addRoom);
 
         //rooms display panel
-        grid.gridx = 1;
+        grid.gridy = 2;
         roomsPanel.setAlignmentY(250);
         mainPanel.add(roomsPanel,grid);
 
@@ -87,8 +104,46 @@ public class RoomsManager {
             delete.setText("Delete");
             panelRooms.add(delete,c);
         }
-
         panelRooms.revalidate();
         panelRooms.repaint();
+    }
+
+    //display add room section into frame
+    public static void displayAddRoom(){
+        GridBagConstraints grid = new GridBagConstraints();
+        grid.insets = new Insets(10,10,10,10);
+        JLabel label = new JLabel();
+        label.setText("Room Name");
+        grid.gridx = 0;
+        addRoomPanel.add(label,grid);
+
+        JTextField text = new JTextField();
+        text.setPreferredSize(new Dimension(200,24));
+        grid.gridx = 1;
+        addRoomPanel.add(text,grid);
+
+        JButton button = new JButton();
+        button.setText("Add");
+        grid.gridx = 2;
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String textValue = text.getText();
+                SqliteDB db = new SqliteDB();
+                db.addRoom(textValue);
+                db.closeConnection();
+                addRoomPanel.removeAll();
+                addRoomPanel.revalidate();
+                addRoomPanel.repaint();
+                addRoom.setEnabled(true);
+                refreshRooms(roomsPanel);
+            }
+        });
+        addRoomPanel.add(button,grid);
+
+        addRoomPanel.revalidate();
+        addRoomPanel.repaint();
+        frame.revalidate();
+        frame.repaint();
     }
 }
