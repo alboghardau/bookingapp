@@ -15,6 +15,14 @@ public class FramesHelper {
         return dimension;
     }
 
+    public static GridBagConstraints gridSettings(int x, int y){
+        GridBagConstraints grid = new GridBagConstraints();
+        grid.insets = new Insets(10,10,10,10);
+        grid.gridx = x;
+        grid.gridy = y;
+        return grid;
+    }
+
     //displays window to add new room
     public static void addRoomFrame(){
         JFrame frame = new JFrame();
