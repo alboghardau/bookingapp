@@ -7,6 +7,8 @@ import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -162,21 +164,29 @@ public class MainWindow {
         System.out.println(daysInMonth);
 
         for(Integer j = 0; j < rooms.size(); j = j+2) {
-            JLabel label = new JLabel();
-            label.setText(rooms.get(j));
-            panelCalendar.add(label, FramesHelper.gridSettings(0, j+2, 2));
+            JLabel label1 = new JLabel();
+            label1.setText(rooms.get(j));
+            panelCalendar.add(label1, FramesHelper.gridSettings(0, j+2, 2));
 
             for (Integer i = 1; i < daysInMonth + 1; i++) {
+                final int day = i;
 
                 JLabel labelRoom = new JLabel();
                 labelRoom.setText(i.toString());
                 panelCalendar.add(labelRoom, FramesHelper.gridSettings(i, j+1, 2));
 
-                label = new JLabel();
+                final JLabel label = new JLabel();
 
                 label.setMaximumSize(new Dimension(32,24));
                 label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box.png")));
                 panelCalendar.add(label, FramesHelper.gridSettings(i, j+2, 2));
+                label.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        addBookingFromList(day);
+                        label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
+                    }
+                });
             }
         }
 
@@ -217,6 +227,7 @@ public class MainWindow {
                 panelTopEditor.removeAll();
                 panelTopEditor.revalidate();
                 panelTopEditor.repaint();
+                displayCallendar(selectedYear,selectedMonth);
             }
         });
 
@@ -237,6 +248,78 @@ public class MainWindow {
         checkoutText.setPreferredSize(new Dimension(150,28));
         checkoutText.setMinimumSize(new Dimension(150,28));
         panelTopEditor.add(checkoutText,FramesHelper.gridSettings(3,1,5));
+
+        JButton addEdit = new JButton();
+        addEdit.setText("Add");
+        addEdit.setPreferredSize(new Dimension(120,28));
+        addEdit.setMinimumSize(new Dimension(120,28));
+        panelTopEditor.add(addEdit,FramesHelper.gridSettings(4,1,5));
+
+        panelTopEditor.revalidate();
+        panelTopEditor.repaint();
+    }
+
+    private static void addBookingFromList(int dayOfTheMonth){
+
+
+        LocalDate localDate = LocalDate.of(selectedYear,selectedMonth,dayOfTheMonth);
+        System.out.println("Add booking from date"+localDate);
+
+        panelTopEditor.removeAll();
+
+        JLabel nameLabel = new JLabel();
+        nameLabel.setText("Name:");
+        panelTopEditor.add(nameLabel,FramesHelper.gridSettings(0,0,5));
+
+        JTextField nameText = new JTextField();
+        nameText.setPreferredSize(new Dimension(150,28));
+        nameText.setMinimumSize(new Dimension(150,28));
+        panelTopEditor.add(nameText,FramesHelper.gridSettings(1,0,5));
+
+        JLabel phoneLabel = new JLabel();
+        phoneLabel.setText("Phone:");
+        panelTopEditor.add(phoneLabel,FramesHelper.gridSettings(2,0,5));
+
+        JTextField phoneText = new JTextField();
+        phoneText.setPreferredSize(new Dimension(150,28));
+        phoneText.setMinimumSize(new Dimension(150,28));
+        panelTopEditor.add(phoneText,FramesHelper.gridSettings(3,0,5));
+
+        JButton closeEditor = new JButton();
+        closeEditor.setText("Close");
+        closeEditor.setPreferredSize(new Dimension(120,28));
+        closeEditor.setMinimumSize(new Dimension(120,28));
+        panelTopEditor.add(closeEditor,FramesHelper.gridSettings(4,0,5));
+        closeEditor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buttonAddBooking.setEnabled(true);
+                panelTopEditor.removeAll();
+                panelTopEditor.revalidate();
+                panelTopEditor.repaint();
+                displayCallendar(selectedYear,selectedMonth);
+            }
+        });
+
+        JLabel checkinLabel = new JLabel();
+        checkinLabel.setText("Check in:");
+        panelTopEditor.add(checkinLabel,FramesHelper.gridSettings(0,1,5));
+
+        JTextField checkinText = new JTextField();
+        checkinText.setText(localDate.toString());
+        checkinText.setPreferredSize(new Dimension(150,28));
+        checkinText.setMinimumSize(new Dimension(150,28));
+        panelTopEditor.add(checkinText,FramesHelper.gridSettings(1,1,5));
+
+        JLabel nightsLabel = new JLabel();
+        nightsLabel.setText("Nights stay:");
+        panelTopEditor.add(nightsLabel,FramesHelper.gridSettings(2,1,5));
+
+        JTextField nightsText = new JTextField();
+        nightsText.setText("1");
+        nightsText.setPreferredSize(new Dimension(150,28));
+        nightsText.setMinimumSize(new Dimension(150,28));
+        panelTopEditor.add(nightsText,FramesHelper.gridSettings(3,1,5));
 
         JButton addEdit = new JButton();
         addEdit.setText("Add");
