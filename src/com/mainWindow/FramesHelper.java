@@ -4,6 +4,7 @@ import com.sun.javaws.util.JfxHelper;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class FramesHelper {
 
@@ -15,9 +16,9 @@ public class FramesHelper {
         return dimension;
     }
 
-    public static GridBagConstraints gridSettings(int x, int y){
+    public static GridBagConstraints gridSettings(int x, int y,int insets){
         GridBagConstraints grid = new GridBagConstraints();
-        grid.insets = new Insets(10,10,10,10);
+        grid.insets = new Insets(insets,insets,insets,insets);
         grid.gridx = x;
         grid.gridy = y;
         return grid;
