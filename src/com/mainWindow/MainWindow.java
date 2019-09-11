@@ -1,6 +1,7 @@
 package com.mainWindow;
 
 import com.sun.xml.internal.messaging.saaj.soap.JpegDataContentHandler;
+import org.sqlite.util.StringUtils;
 
 import javax.swing.*;
 import java.applet.Applet;
@@ -156,7 +157,7 @@ public class MainWindow {
 
         SqliteDB db = new SqliteDB();
         ArrayList<String> rooms = db.listRooms();
-        db.closeConnection();
+
 
         Calendar c = new GregorianCalendar(year,month,1);
         YearMonth yearMonth = YearMonth.of(year,month+1);
@@ -164,9 +165,13 @@ public class MainWindow {
         System.out.println(daysInMonth);
 
         for(Integer j = 0; j < rooms.size(); j = j+2) {
+            int roomId = Integer.parseInt(rooms.get(j+1));
+
             JLabel label1 = new JLabel();
             label1.setText(rooms.get(j));
             panelCalendar.add(label1, FramesHelper.gridSettings(0, j+2, 2));
+
+            ArrayList<Integer> bookedList = db.getBookedDaysInMonth(roomId,selectedYear,selectedMonth);
 
             for (Integer i = 1; i < daysInMonth + 1; i++) {
                 final int day = i;
@@ -175,23 +180,48 @@ public class MainWindow {
                 labelRoom.setText(i.toString());
                 panelCalendar.add(labelRoom, FramesHelper.gridSettings(i, j+1, 2));
 
-                final JLabel label = new JLabel();
-
-                label.setMaximumSize(new Dimension(32,24));
-                label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box.png")));
-                panelCalendar.add(label, FramesHelper.gridSettings(i, j+2, 2));
-                label.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        addBookingFromList(day);
-                        //label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
-                    }
-                });
+                if(isBooked(bookedList,i) > 0){
+                    final JLabel label = new JLabel();
+                    label.setMaximumSize(new Dimension(32,24));
+                    label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
+                    panelCalendar.add(label, FramesHelper.gridSettings(i, j+2, 2));
+                    label.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            //addBookingFromList(day,roomId);
+                            //label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
+                        }
+                    });
+                }else {
+                    final JLabel label = new JLabel();
+                    label.setMaximumSize(new Dimension(32, 24));
+                    label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box.png")));
+                    panelCalendar.add(label, FramesHelper.gridSettings(i, j + 2, 2));
+                    label.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            addBookingFromList(day, roomId);
+                            //label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
+                        }
+                    });
+                }
             }
         }
 
+        db.closeConnection();
         panelCalendar.revalidate();
         panelCalendar.repaint();
+    }
+
+    //tests if a day is booked or not
+    private static int isBooked(ArrayList<Integer> list,int day){
+            for(int i = 0; i < list.size(); i= i+2){
+                if(list.get(i+1) == day){
+                    return list.get(i);
+                }
+        }
+
+        return 0;
     }
 
     private static void displayAddBooking(){
@@ -259,11 +289,10 @@ public class MainWindow {
         panelTopEditor.repaint();
     }
 
-    private static void addBookingFromList(int dayOfTheMonth){
-
+    private static void addBookingFromList(int dayOfTheMonth, int roomId){
 
         LocalDate localDate = LocalDate.of(selectedYear,selectedMonth,dayOfTheMonth);
-        System.out.println("Add booking from date"+localDate);
+        System.out.println("Add booking from date "+localDate);
 
         panelTopEditor.removeAll();
 
@@ -285,11 +314,20 @@ public class MainWindow {
         phoneText.setMinimumSize(new Dimension(150,28));
         panelTopEditor.add(phoneText,FramesHelper.gridSettings(3,0,5));
 
+        JLabel sumLabel = new JLabel("Sum:");
+        panelTopEditor.add(sumLabel,FramesHelper.gridSettings(4,0,5));
+
+        JTextField sumText = new JTextField();
+        sumText.setPreferredSize(new Dimension(150,28));
+        sumText.setMinimumSize(new Dimension(150,28));
+        panelTopEditor.add(sumText,FramesHelper.gridSettings(5,0,5));
+
+        //BUTTON TO CLOSE ADD BOOKING EDITOR
         JButton closeEditor = new JButton();
         closeEditor.setText("Close");
         closeEditor.setPreferredSize(new Dimension(120,28));
         closeEditor.setMinimumSize(new Dimension(120,28));
-        panelTopEditor.add(closeEditor,FramesHelper.gridSettings(4,0,5));
+        panelTopEditor.add(closeEditor,FramesHelper.gridSettings(6,0,5));
         closeEditor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -322,11 +360,32 @@ public class MainWindow {
         nightsText.setMinimumSize(new Dimension(150,28));
         panelTopEditor.add(nightsText,FramesHelper.gridSettings(3,1,5));
 
+        //BUTTON TO ADD BOOKING
         JButton addEdit = new JButton();
         addEdit.setText("Add");
         addEdit.setPreferredSize(new Dimension(120,28));
         addEdit.setMinimumSize(new Dimension(120,28));
-        panelTopEditor.add(addEdit,FramesHelper.gridSettings(4,1,5));
+        panelTopEditor.add(addEdit,FramesHelper.gridSettings(6,1,5));
+        addEdit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(nameText.getText() != "" && phoneText.getText() != "" && isNumeric(sumText.getText())){
+
+                    LocalDate checkoutDate = LocalDate.of(selectedYear,selectedMonth,dayOfTheMonth).plusDays(Integer.parseInt(nightsText.getText()));
+
+
+                    SqliteDB db = new SqliteDB();
+                    db.addBooking(roomId,nameText.getText(),phoneText.getText(),checkinText.getText(),checkoutDate.toString(),Double.parseDouble(sumText.getText()));
+                    db.closeConnection();
+                    buttonAddBooking.setEnabled(true);
+                    panelTopEditor.removeAll();
+                    panelTopEditor.revalidate();
+                    panelTopEditor.repaint();
+                    displayCallendar(selectedYear,selectedMonth);
+                    db.closeConnection();
+                }
+            }
+        });
 
         panelTopEditor.revalidate();
         panelTopEditor.repaint();
@@ -342,6 +401,16 @@ public class MainWindow {
         displayCallendar(selectedYear,selectedMonth);
     }
 
+    //CHECKS IF A STRING IS NUMERIC
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch(NumberFormatException e){
+            return false;
+        }
+    }
+
     public static void main(String [] args){
 
         if(selectedMonth == null){
@@ -351,6 +420,18 @@ public class MainWindow {
             selectedYear =  Calendar.getInstance().get(Calendar.YEAR);;
         }
         initialDisplay();
+
+        testStuff();
+
+
+    }
+
+    private static void testStuff(){
+        LocalDate date1 = LocalDate.of(2019,8,15);
+        LocalDate date2 = LocalDate.of(2019,8,15);
+
+        String s1 = date1.toString();
+        String s2 = date2.toString();
 
 
     }
