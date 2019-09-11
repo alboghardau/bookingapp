@@ -123,8 +123,9 @@ public class MainWindow {
             buttonMonth.setMinimumSize(new Dimension(120,28));
             buttonMonth.setText(monthsArray[i]);
             panelLeftSide.add(buttonMonth,FramesHelper.gridSettings(0,1+i+yearsArray.length,5));
-            final int month = i;
-            if( i == selectedMonth) {
+            final int month = i+1;
+            System.out.println("Luna:"+selectedMonth+1);
+            if( i == selectedMonth-1) {
                 buttonMonth.setEnabled(false);
             }
             buttonMonth.addActionListener(new ActionListener() {
@@ -148,6 +149,8 @@ public class MainWindow {
 
         panelCalendar.removeAll();
 
+        System.out.println(year+"+"+month);
+
 //        String [] days = new String[] {"MON","TUE","WED","THU","FRY","SAT","SUN"};
 //        for (int i = 0; i < days.length; i++) {
 //            JLabel label = new JLabel();
@@ -160,7 +163,7 @@ public class MainWindow {
 
 
         Calendar c = new GregorianCalendar(year,month,1);
-        YearMonth yearMonth = YearMonth.of(year,month+1);
+        YearMonth yearMonth = YearMonth.of(year,month);
         int daysInMonth = yearMonth.lengthOfMonth();
         System.out.println(daysInMonth);
 
@@ -170,7 +173,7 @@ public class MainWindow {
             JLabel label1 = new JLabel();
             label1.setText(rooms.get(j));
             panelCalendar.add(label1, FramesHelper.gridSettings(0, j+2, 2));
-
+            System.out.println("Luna:"+selectedMonth);
             ArrayList<Integer> bookedList = db.getBookedDaysInMonth(roomId,selectedYear,selectedMonth);
 
             for (Integer i = 1; i < daysInMonth + 1; i++) {
@@ -184,7 +187,7 @@ public class MainWindow {
                     final JLabel label = new JLabel();
                     label.setMaximumSize(new Dimension(32,24));
                     label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
-                    panelCalendar.add(label, FramesHelper.gridSettings(i, j+2, 2));
+                    panelCalendar.add(label, FramesHelper.gridSettings(i, j+2, 0));
                     label.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -196,7 +199,7 @@ public class MainWindow {
                     final JLabel label = new JLabel();
                     label.setMaximumSize(new Dimension(32, 24));
                     label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box.png")));
-                    panelCalendar.add(label, FramesHelper.gridSettings(i, j + 2, 2));
+                    panelCalendar.add(label, FramesHelper.gridSettings(i, j + 2, 0));
                     label.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -372,7 +375,7 @@ public class MainWindow {
                 if(nameText.getText() != "" && phoneText.getText() != "" && isNumeric(sumText.getText())){
 
                     LocalDate checkoutDate = LocalDate.of(selectedYear,selectedMonth,dayOfTheMonth).plusDays(Integer.parseInt(nightsText.getText()));
-
+                    System.out.println(checkoutDate.toString());
 
                     SqliteDB db = new SqliteDB();
                     db.addBooking(roomId,nameText.getText(),phoneText.getText(),checkinText.getText(),checkoutDate.toString(),Double.parseDouble(sumText.getText()));
@@ -414,7 +417,8 @@ public class MainWindow {
     public static void main(String [] args){
 
         if(selectedMonth == null){
-            selectedMonth = Calendar.getInstance().get(Calendar.MONTH);
+            selectedMonth = Calendar.getInstance().get(Calendar.MONTH)+1;
+            System.out.println("Calendar:getInstance()MONTH-"+selectedMonth);
         }
         if(selectedYear == null){
             selectedYear =  Calendar.getInstance().get(Calendar.YEAR);;
@@ -427,11 +431,6 @@ public class MainWindow {
     }
 
     private static void testStuff(){
-        LocalDate date1 = LocalDate.of(2019,8,15);
-        LocalDate date2 = LocalDate.of(2019,8,15);
-
-        String s1 = date1.toString();
-        String s2 = date2.toString();
 
 
     }

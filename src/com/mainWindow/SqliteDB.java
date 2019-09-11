@@ -59,8 +59,9 @@ public class SqliteDB {
             this.statement = connection.createStatement();
             ResultSet set = statement.executeQuery("SELECT * FROM bookings WHERE room_id = '" + room_id+"'");
 
-            YearMonth yearMonth = YearMonth.of(year,month+1);
+            YearMonth yearMonth = YearMonth.of(year,month);
             int daysInMonth = yearMonth.lengthOfMonth();
+
 
             while(set.next()){
                 if(testDateFromString(set.getString("date_in"),set.getString("date_out"),year,month)){
@@ -109,8 +110,6 @@ public class SqliteDB {
         }else{
             m = month+"";
         }
-
-        System.out.println(cIn.substring(0,7));
         if(cIn.substring(0,7).equals(year+"-"+m) || cOut.substring(0,7).equals(year+"-"+m)){
             return true;
         }else {
