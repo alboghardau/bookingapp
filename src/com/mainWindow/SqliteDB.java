@@ -47,6 +47,20 @@ public class SqliteDB {
         }
     }
 
+    //adds booking to the database
+    public void addBooking(int room_id,String name, String telephone, String date_in, String date_out, Double value){
+
+        try{
+            this.statement = connection.createStatement();
+            statement.executeQuery(String.format("INSERT INTO bookings (room_id,name,telephone,date_in,date_out,value) VALUES ('%d','%s','%s','%s','%s','%f')",room_id,name,telephone,date_in,date_out,value));
+            System.out.println("Added new booking");
+
+        }catch (Exception e){
+            System.out.println("Failed to add booking");
+            System.out.println(e.toString());
+        }
+    }
+
     //adds room to rooms
     public void addRoom(String roomName){
         try{

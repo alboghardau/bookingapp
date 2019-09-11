@@ -184,7 +184,7 @@ public class MainWindow {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         addBookingFromList(day);
-                        label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
+                        //label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
                     }
                 });
             }
@@ -306,6 +306,7 @@ public class MainWindow {
         panelTopEditor.add(checkinLabel,FramesHelper.gridSettings(0,1,5));
 
         JTextField checkinText = new JTextField();
+        checkinText.setEnabled(false);
         checkinText.setText(localDate.toString());
         checkinText.setPreferredSize(new Dimension(150,28));
         checkinText.setMinimumSize(new Dimension(150,28));
