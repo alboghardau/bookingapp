@@ -227,6 +227,22 @@ public class MainWindow {
         return 0;
     }
 
+    private static void displayBooking(int id){
+        panelTopEditor.removeAll();
+
+        SqliteDB db = new SqliteDB();
+        ArrayList<String> result = db.getBooking(id); //roomId,name,phone,dateIn,dateOut,value
+        db.closeConnection();
+
+        JLabel nameLabel = new JLabel();
+        nameLabel.setText("Name:");
+        panelTopEditor.add(nameLabel,FramesHelper.gridSettings(0,0,5));
+
+
+        panelTopEditor.revalidate();
+        panelTopEditor.repaint();
+    }
+
     private static void displayAddBooking(){
         panelTopEditor.removeAll();
 

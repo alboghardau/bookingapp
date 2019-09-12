@@ -131,6 +131,39 @@ public class SqliteDB {
         }
     }
 
+    public ArrayList<String> getBooking(int id){
+        ArrayList<String> list = new ArrayList<>();
+        try{
+            this.statement = connection.createStatement();
+            ResultSet set = statement.executeQuery("SELECT * FROM bookings WHERE id = '"+id+"'");
+            while (set.next()){
+                list.add(Integer.toString(set.getInt("room_Id")));
+                list.add(set.getString("name"));
+                list.add(set.getString("telephone"));
+                list.add(set.getString("date_in"));
+                list.add(set.getString("date_out"));
+                list.add(set.getString("value"));
+            }
+        }catch (Exception e){
+            System.out.println("Can't get booking from DB");
+            System.out.println(e.toString());
+        }
+
+        return list;
+    }
+
+    //deletes booking by id
+    public void deleteBooking(int id){
+        try{
+            this.statement = connection.createStatement();
+            statement.executeUpdate("DELTE FROM bookings WHERE id = '"+id+"'");
+            System.out.println("Deleted booking with id = "+id);
+        }catch (Exception e){
+            System.out.println("Delete booking failed for id = "+ id);
+            System.out.println(e.toString());
+        }
+    }
+
     //adds room to rooms
     public void addRoom(String roomName){
         try{
