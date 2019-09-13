@@ -156,7 +156,7 @@ public class SqliteDB {
     public void deleteBooking(int id){
         try{
             this.statement = connection.createStatement();
-            statement.executeUpdate("DELTE FROM bookings WHERE id = '"+id+"'");
+            statement.executeUpdate("DELETE FROM bookings WHERE id = '"+id+"'");
             System.out.println("Deleted booking with id = "+id);
         }catch (Exception e){
             System.out.println("Delete booking failed for id = "+ id);

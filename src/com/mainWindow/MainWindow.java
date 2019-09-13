@@ -2,6 +2,7 @@ package com.mainWindow;
 
 import com.sun.xml.internal.messaging.saaj.soap.JpegDataContentHandler;
 import org.sqlite.util.StringUtils;
+import sun.security.x509.FreshestCRLExtension;
 
 import javax.swing.*;
 import java.applet.Applet;
@@ -184,6 +185,7 @@ public class MainWindow {
                 panelCalendar.add(labelRoom, FramesHelper.gridSettings(i, j+1, 2));
 
                 if(isBooked(bookedList,i) > 0){
+                    final int d = isBooked(bookedList,i);
                     final JLabel label = new JLabel();
                     label.setMaximumSize(new Dimension(32,24));
                     label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
@@ -191,7 +193,7 @@ public class MainWindow {
                     label.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            //addBookingFromList(day,roomId);
+                            displayBooking(d);
                             //label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
                         }
                     });
@@ -216,16 +218,16 @@ public class MainWindow {
         panelCalendar.repaint();
     }
 
-    //tests if a day is booked or not
+    //tests if a day is booked or not, RETURNS Booking id
     private static int isBooked(ArrayList<Integer> list,int day){
             for(int i = 0; i < list.size(); i= i+2){
                 if(list.get(i+1) == day){
                     return list.get(i);
                 }
         }
-
         return 0;
     }
+
 
     private static void displayBooking(int id){
         panelTopEditor.removeAll();
@@ -234,9 +236,50 @@ public class MainWindow {
         ArrayList<String> result = db.getBooking(id); //roomId,name,phone,dateIn,dateOut,value
         db.closeConnection();
 
-        JLabel nameLabel = new JLabel();
-        nameLabel.setText("Name:");
+        JLabel nameLabel = new JLabel("Name:");
         panelTopEditor.add(nameLabel,FramesHelper.gridSettings(0,0,5));
+
+        JLabel nameText = new JLabel(result.get(1));
+        panelTopEditor.add(nameText,FramesHelper.gridSettings(1,0,5));
+
+        JLabel phoneLabel = new JLabel("Phone:");
+        panelTopEditor.add(phoneLabel,FramesHelper.gridSettings(2,0,5));
+
+        JLabel phoneText = new JLabel(result.get(2));
+        panelTopEditor.add(phoneText,FramesHelper.gridSettings(3,0,5));
+
+        JLabel checkinDate  = new JLabel("Check in:");
+        panelTopEditor.add(checkinDate, FramesHelper.gridSettings(4,0,5));
+
+        JLabel checkinText = new JLabel(result.get(3));
+        panelTopEditor.add(checkinText,FramesHelper.gridSettings(5,0,5));
+
+        JLabel checkoutLabel = new JLabel("Check out:");
+        panelTopEditor.add(checkoutLabel,FramesHelper.gridSettings(6,0,5));
+
+        JLabel checkoutText = new JLabel(result.get(4));
+        panelTopEditor.add(checkoutText,FramesHelper.gridSettings(7,0,5));
+
+        JLabel valueLabel = new JLabel("Value - RON ");
+        panelTopEditor.add(valueLabel,FramesHelper.gridSettings(8,0,5));
+
+        JLabel valueText = new JLabel(result.get(5));
+        panelTopEditor.add(valueText,FramesHelper.gridSettings(9,0,5));
+
+        JButton deleteButton = new JButton("Delete");
+        panelTopEditor.add(deleteButton,FramesHelper.gridSettings(10,0,5));
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SqliteDB db = new SqliteDB();
+                db.deleteBooking(id);
+                db.closeConnection();
+                panelTopEditor.removeAll();
+                panelTopEditor.revalidate();
+                panelTopEditor.repaint();
+                displayCallendar(selectedYear,selectedMonth);
+            }
+        });
 
 
         panelTopEditor.revalidate();
