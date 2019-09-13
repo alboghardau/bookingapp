@@ -83,6 +83,40 @@ public class SqliteDB {
         return list;
     }
 
+    //returns 0 if a date is not available for booking or how many days after are available
+    public int isAvailable(LocalDate date,int roomId){
+        ArrayList<String> list = new ArrayList<>();
+        try{
+            this.statement = connection.createStatement();
+            ResultSet set = statement.executeQuery("SELECT * FROM bookings WHERE room_id = '" + roomId+"'");
+            while(set.next()){
+                list.add(set.getString("date_in"));
+            }
+            list.sort(String::compareTo);
+
+            int daysAvailable = 0;
+            for(int i = 0; i < list.size(); i++){
+                if(date.isBefore(LocalDate.parse(list.get(i)))){
+                    while (!date.isEqual(LocalDate.parse(list.get(i)))) {
+                        daysAvailable++;
+                        date = date.plusDays(1);
+                    }
+                    break;
+                }
+            }
+            if(daysAvailable == 0){
+                daysAvailable = 30;
+            }
+            System.out.println("Days available:"+daysAvailable);
+            System.out.println(list.toString());
+            return daysAvailable;
+        }catch (Exception e){
+            System.out.println("Failed to get result when checking isAvailable");
+            System.out.println(e.toString());
+        }
+        return 0;
+    }
+
     //returs how many days a rooms is booked
     private static int daysBooked (String cIn, String cOut){
         int daysBooked = 1;
@@ -124,13 +158,13 @@ public class SqliteDB {
             this.statement = connection.createStatement();
             statement.executeUpdate(String.format("INSERT INTO bookings (room_id,name,telephone,date_in,date_out,value) VALUES ('%d','%s','%s','%s','%s','%f')",room_id,name,telephone,date_in,date_out,value));
             System.out.println("Added new booking");
-
         }catch (Exception e){
             System.out.println("Failed to add booking");
             System.out.println(e.toString());
         }
     }
 
+    //retrund booking details
     public ArrayList<String> getBooking(int id){
         ArrayList<String> list = new ArrayList<>();
         try{
@@ -148,7 +182,6 @@ public class SqliteDB {
             System.out.println("Can't get booking from DB");
             System.out.println(e.toString());
         }
-
         return list;
     }
 

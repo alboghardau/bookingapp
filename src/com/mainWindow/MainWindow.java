@@ -162,7 +162,6 @@ public class MainWindow {
         SqliteDB db = new SqliteDB();
         ArrayList<String> rooms = db.listRooms();
 
-
         Calendar c = new GregorianCalendar(year,month,1);
         YearMonth yearMonth = YearMonth.of(year,month);
         int daysInMonth = yearMonth.lengthOfMonth();
@@ -205,7 +204,10 @@ public class MainWindow {
                     label.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            addBookingFromList(day, roomId);
+                            SqliteDB db2 = new SqliteDB();
+                            int avialbleDays = db2.isAvailable(LocalDate.of(selectedYear,selectedMonth,day),roomId);
+                            db2.closeConnection();
+                            addBookingFromList(day, roomId,avialbleDays);
                             //label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
                         }
                     });
@@ -227,7 +229,6 @@ public class MainWindow {
         }
         return 0;
     }
-
 
     private static void displayBooking(int id){
         panelTopEditor.removeAll();
@@ -351,7 +352,7 @@ public class MainWindow {
         panelTopEditor.repaint();
     }
 
-    private static void addBookingFromList(int dayOfTheMonth, int roomId){
+    private static void addBookingFromList(int dayOfTheMonth, int roomId, int availableDays){
 
         LocalDate localDate = LocalDate.of(selectedYear,selectedMonth,dayOfTheMonth);
         System.out.println("Add booking from date "+localDate);
@@ -431,7 +432,10 @@ public class MainWindow {
         addEdit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(nameText.getText() != "" && phoneText.getText() != "" && isNumeric(sumText.getText())){
+                if(Integer.parseInt(nightsText.getText()) > availableDays) {
+                    JFrame frame = new JFrame();
+                    JOptionPane.showMessageDialog(frame, "Not enough nights available");
+                }else if(nameText.getText() != "" && phoneText.getText() != "" && isNumeric(sumText.getText())){
 
                     LocalDate checkoutDate = LocalDate.of(selectedYear,selectedMonth,dayOfTheMonth).plusDays(Integer.parseInt(nightsText.getText()));
                     System.out.println(checkoutDate.toString());
@@ -445,9 +449,16 @@ public class MainWindow {
                     panelTopEditor.repaint();
                     displayCallendar(selectedYear,selectedMonth);
                     db.closeConnection();
+                }else{
+                    JFrame frame = new JFrame();
+                    JOptionPane.showMessageDialog(frame, "Name, phone or sum not set!");
                 }
             }
         });
+
+        JLabel availableLabel = new JLabel();
+        availableLabel.setText("MAX: "+availableDays);
+        panelTopEditor.add(availableLabel,FramesHelper.gridSettings(4,1,5));
 
         panelTopEditor.revalidate();
         panelTopEditor.repaint();
@@ -485,8 +496,6 @@ public class MainWindow {
         initialDisplay();
 
         testStuff();
-
-
     }
 
     private static void testStuff(){
