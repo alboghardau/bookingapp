@@ -208,6 +208,7 @@ public class MainWindow {
                             int avialbleDays = db2.isAvailable(LocalDate.of(selectedYear,selectedMonth,day),roomId);
                             db2.closeConnection();
                             addBookingFromList(day, roomId,avialbleDays);
+                            label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-orange.png")));
                             //label.setIcon(new javax.swing.ImageIcon(ImageIcon.class.getResource("/check-box-green.png")));
                         }
                     });
