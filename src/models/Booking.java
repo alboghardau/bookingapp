@@ -1,4 +1,4 @@
-package com.mainWindow;
+package models;
 
 public class Booking {
 
